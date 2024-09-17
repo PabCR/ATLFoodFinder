@@ -1,31 +1,106 @@
 {% load static %}
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Maps Example</title>
+    <title>ATLFoodFinder</title>
     <style>
-        /* Set the size of the map div */
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left sidebar for sorting/filtering */
+        .sidebar {
+            width: 20%;
+            padding: 20px;
+            background-color: #f4f4f4;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Main container for the map and right sidebar */
+        .container {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        /* Map container */
         #map {
-            height: 100vh; /* Full height of the screen */
-            width: 100%; /* Full width of the screen */
+            flex-grow: 1;
+            height: 100vh;
+        }
+
+        /* Right sidebar for restaurant listings */
+        .restaurant-list {
+            width: 20%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .restaurant {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .restaurant h3 {
+            margin: 0;
+        }
+
+        .restaurant p {
+            margin: 5px 0;
+        }
+
+        /* Add some spacing for the last restaurant */
+        .restaurant:last-child {
+            border-bottom: none;
+        }
+
+        /* Styling for the iframe (embed map) */
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
         }
     </style>
+
     <!-- Load the Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" 
-            async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
     <script>
         // This function initializes the map
         function initMap() {
-            // Specify the coordinates for the center of the map
-            const atlanta = { lat: 33.7490, lng: -84.3880 }; // Atlanta, GA coordinates
-            
-            // Create a new map instance and attach it to the "map" div
+            const atlanta = { lat: 33.7490, lng: -84.3880 };
+
             const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 12, // Zoom level (can be adjusted)
-                center: atlanta, // Center the map on Atlanta
+                zoom: 12,
+                center: atlanta,
             });
 
             const marker = new google.maps.Marker({
@@ -34,32 +109,90 @@
                 title: "Atlanta, GA"
             });
         }
+
+        // This function will handle the filtering and update the restaurant list
+        function filterRestaurants() {
+            const sortOption = document.getElementById('sort').value;
+            const cuisine = document.getElementById('cuisine').value;
+            const priceRange = document.getElementById('price-range').value;
+
+            // Example function - Here you would apply the filter logic and update the map
+            console.log("Sorting by:", sortOption);
+            console.log("Filtering by cuisine:", cuisine);
+            console.log("Filtering by price range:", priceRange);
+
+            // You'd dynamically update the map markers and the restaurant list here based on the filters
+        }
     </script>
 </head>
-<body>
-    <!-- This is where the map will appear -->
-    <div id="map"></div>
-</body>
-</html>
 
 <body>
-    <header>
-        <h1>Welcome to ATLFoodFinder!</h1>
-        <p>Your guide to the best food spots in Atlanta.</p>
-    </header>
+    <!-- Left sidebar for filters -->
+    <div class="sidebar">
+        <h2>Filters</h2>
+        <div class="filter-group">
+            <label for="sort">Sort By:</label>
+            <select id="sort" onchange="filterRestaurants()">
+                <option value="rating">Rating</option>
+                <option value="distance">Distance</option>
+                <option value="price">Price</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="cuisine">Cuisine:</label>
+            <select id="cuisine" onchange="filterRestaurants()">
+                <option value="all">All</option>
+                <option value="american">American</option>
+                <option value="italian">Italian</option>
+                <option value="asian">Asian</option>
+                <option value="mexican">Mexican</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="price-range">Price Range:</label>
+            <select id="price-range" onchange="filterRestaurants()">
+                <option value="all">All</option>
+                <option value="1">$</option>
+                <option value="2">$$</option>
+                <option value="3">$$$</option>
+                <option value="4">$$$$</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Main content area (map and restaurant list) -->
+    <div class="container">
+        <!-- Google Maps container -->
+        <div id="map"></div>
+
+        <!-- Right sidebar for the restaurant list -->
+        <div class="restaurant-list">
+            <h2>Restaurants</h2>
+            <div class="restaurant">
+                <h3>Best Burgers</h3>
+                <p>American - $$</p>
+                <iframe
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Best+Burgers,Atlanta+GA"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="restaurant">
+                <h3>Sushi Spot</h3>
+                <p>Asian - $$$</p>
+                <iframe
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Sushi+Spot,Atlanta+GA"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="restaurant">
+                <h3>Pasta Paradise</h3>
+                <p>Italian - $$</p>
+                <iframe
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Pasta+Paradise,Atlanta+GA"
+                    allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
 </body>
-</div>
-<iframe
-    width="600"
-    height="450"
-    style="border:0"
-    loading="lazy"
-    allowfullscreen
-    referrerpolicy="no-referrer-when-downgrade"
-    src="https://www.google.com/maps/embed/v1/place?key=API_KEY q=Space+Needle,Seattle+WA">
-</iframe>
-</div>
-    
-    </script>
-</body>
+
 </html>

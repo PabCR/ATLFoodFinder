@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Example</title>
+    <style>
+        /* Set the size of the map div */
+        #map {
+            height: 100vh; /* Full height of the screen */
+            width: 100%; /* Full width of the screen */
+        }
+    </style>
+    <!-- Load the Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" 
+            async defer></script>
+    <script>
+        // This function initializes the map
+        function initMap() {
+            // Specify the coordinates for the center of the map
+            const atlanta = { lat: 33.7490, lng: -84.3880 }; // Atlanta, GA coordinates
+            
+            // Create a new map instance and attach it to the "map" div
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 12, // Zoom level (can be adjusted)
+                center: atlanta, // Center the map on Atlanta
+            });
+
+            const marker = new google.maps.Marker({
+                position: atlanta,
+                map: map,
+                title: "Atlanta, GA"
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- This is where the map will appear -->
+    <div id="map"></div>
+</body>
+</html>
+
+<body>
+    <header>
+        <h1>Welcome to ATLFoodFinder!</h1>
+        <p>Your guide to the best food spots in Atlanta.</p>
+    </header>
+</body>
+</div>
+<iframe
+    width="600"
+    height="450"
+    style="border:0"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed/v1/place?key=API_KEY q=Space+Needle,Seattle+WA">
+</iframe>
+</div>
+    
+    </script>
+</body>
+</html>

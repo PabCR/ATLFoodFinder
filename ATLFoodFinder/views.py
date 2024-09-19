@@ -15,8 +15,8 @@ def register(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'ATLFoodFinder/register.html', {'form': form})
 
 @login_required
 def profile(request):
-    return render(request, 'profile.html')
+    return render(request, 'ATLFoodFinder/profile.html')

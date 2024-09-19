@@ -55,10 +55,7 @@ ROOT_URLCONF = 'ATLFoodFinder.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'ATLFoodFinder/templates',
-            BASE_DIR / 'ATLFoodFinder/logintemplates',
-        ],  # You can leave this empty or point it to a global template folder if needed
+        'DIRS': [BASE_DIR / 'ATLFoodFinder/templates'],  # You can leave this empty or point it to a global template folder if needed
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,6 +125,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'profile'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'

@@ -5,15 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ATLFoodFinder</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'ATLFoodFinder/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
     <header>
-        <h1>Login to ATLFoodFinder</h1>
+        <h1>Welcome to ATLFoodFinder!</h1>
+        <p>Your guide to the best food spots in Atlanta.</p>
     </header>
+    
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'register' %}">Register</a></li>
+        </ul>
+    </nav>
 
     <main>
-        <section>
+        <section class="restaurant-card">
             <h2>Please log in</h2>
             <form method="POST">
                 {% csrf_token %}
@@ -25,8 +33,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2024 ATLFoodFinder</p>
+        <p>© 2024 ATLFoodFinder</p>
     </footer>
 </body>
 </html>
-

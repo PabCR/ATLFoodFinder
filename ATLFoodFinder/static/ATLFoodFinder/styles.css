@@ -1,5 +1,5 @@
 /* Basic styles for the homepage */
-body {
+html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
@@ -71,7 +71,11 @@ main h2 {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .restaurant-card img {
@@ -121,13 +125,25 @@ footer {
     box-shadow: 0 -4px 2px -2px gray;
 }
 
+h2 {
+    color: #333;
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #4CAF50;
+    font-size: 28px;
+    margin-top: 0;
+}
+
+/* Style form and input elements within the card */
 form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 1em;
-    background: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
 }
 
 form input {
@@ -139,15 +155,60 @@ form input {
 }
 
 button {
-    width: 100%;
     padding: 10px;
-    background-color: #5cb85c;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
 }
 
 button:hover {
-    background-color: #4cae4c;
+    background-color: #45a049;
+}
+
+p {
+    text-align: center;
+    color: #555;
+}
+
+p a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+/* Style the navigation bar for all pages */
+nav {
+    margin: 0;
+    padding: 15px;
+    background-color: #333;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 30px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+nav ul li a:hover {
+    background-color: #555;
 }

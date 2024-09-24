@@ -12,3 +12,7 @@ db.sqlite3
 
 # Ignore shell configuration files
 .zshrc
+
+.DS_Store
+
+.idea/

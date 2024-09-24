@@ -1,21 +1,14 @@
-# Ignore environment variable files
-.env
+# Ignore Python cache directories
+__pycache__/
 
-# Ignore database
+# Ignore environment variable file
+.env.py
+
+# Ignore SQLite database file
 db.sqlite3
 
-# Ignore compiled Python files
-*.pyc
+# Ignore IDE configurations (like JetBrains IDEs)
+.idea/
 
-# Ignore media/uploads
-media/
-uploads/
-
-# Default ignored files
-/shelf/
-/workspace.xml
-# Editor-based HTTP Client requests
-/httpRequests/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+# Ignore shell configuration files
+.zshrc

@@ -1,0 +1,37 @@
+# Ignore the IDE configuration directory
+.idea/
+
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Editor-based HTTP Client requests
+/httpRequests/
+
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Python cache files
+__pycache__/
+*.py[cod]  # Ignore Python compiled files
+
+# Byte-compiled / optimized / DLL files
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv/
+
+# Django specific
+*.log
+*.sqlite3  # If you're using SQLite for your database
+/db.sqlite3  # If your database file is named this
+/staticfiles/  # If you collect static files in this directory
+/media/  # If you have a media directory
+
+# Local environment variables
+.env

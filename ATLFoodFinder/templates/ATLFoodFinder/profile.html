@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ATLFoodFinder</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to ATLFoodFinder!</h1>
+        <p>Your guide to the best food spots in Atlanta.</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section>
+            <h2>Profile</h2>
+            <div class="restaurant-card">
+                <h3>Welcome, {{ user.username }}!</h3>
+                <p>This is your profile page where you can manage your data.</p>
+                <a href="{% url 'logout' %}" class="view-business-btn">Logout</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 ATLFoodFinder</p>
+    </footer>
+</body>
+</html>
+

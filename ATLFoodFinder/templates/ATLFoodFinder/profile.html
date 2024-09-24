@@ -25,10 +25,14 @@
             <div class="restaurant-card">
                 <h3>Welcome, {{ user.username }}!</h3>
                 <p>This is your profile page where you can manage your data.</p>
+<<<<<<< HEAD
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="view-business-btn">Logout</button>
                 </form>
+=======
+                <a href="{% url 'logout' %}" class="view-business-btn">Logout</a>
+>>>>>>> 736b1d892f3ecbe4972eb58707071801eaa63fd8
             </div>
         </section>
     </main>
@@ -39,4 +43,7 @@
 </body>
 </html>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 736b1d892f3ecbe4972eb58707071801eaa63fd8

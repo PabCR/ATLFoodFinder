@@ -1,5 +1,5 @@
 /* Basic styles for the homepage */
-body {
+html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
@@ -71,7 +71,11 @@ main h2 {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    padding: 20px;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .restaurant-card img {
@@ -121,40 +125,90 @@ footer {
     box-shadow: 0 -4px 2px -2px gray;
 }
 
-/* styles.css */
-
-/* Styles for the fixed button container */
-.fixed-button-container {
-    position: fixed;
-    bottom: 20px; /* Position it 20px from the bottom */
-    left: 50%;
-    transform: translateX(-50%); /* Center it horizontally */
+h2 {
+    color: #333;
+    font-size: 36px;
     text-align: center;
-    z-index: 1000; /* Ensure it stays on top */
+    margin-bottom: 20px;
 }
 
-/* Styles for the green explore button */
-.explore-map-btn {
-    padding: 15px 30px;
-    font-size: 16px;
-    background-color: #28a745; /* Green color */
+h3 {
+    color: #4CAF50;
+    font-size: 28px;
+    margin-top: 0;
+}
+
+/* Style form and input elements within the card */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px;
+    background-color: #4CAF50;
     color: white;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+p {
+    text-align: center;
+    color: #555;
+}
+
+p a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+/* Style the navigation bar for all pages */
+nav {
+    margin: 0;
+    padding: 15px;
+    background-color: #333;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 30px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 20px;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add slight shadow for emphasis */
 }
 
-/* Button hover effect */
-.explore-map-btn:hover {
-    background-color: #218838; /* Darker green on hover */
-}
-
-/* Mobile responsiveness */
-@media (max-width: 600px) {
-    .explore-map-btn {
-        font-size: 14px;
-        padding: 12px 25px;
-    }
+nav ul li a:hover {
+    background-color: #555;
 }

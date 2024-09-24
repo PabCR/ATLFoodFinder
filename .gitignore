@@ -1,0 +1,14 @@
+# Ignore Python cache directories
+__pycache__/
+
+# Ignore environment variable file
+.env.py
+
+# Ignore SQLite database file
+db.sqlite3
+
+# Ignore IDE configurations (like JetBrains IDEs)
+.idea/
+
+# Ignore shell configuration files
+.zshrc

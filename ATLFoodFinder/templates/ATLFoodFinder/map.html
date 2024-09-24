@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATLFoodFinder</title>
     <style>
@@ -16,12 +16,13 @@
             height: 100vh;
         }
 
-        /* Left sidebar for sorting/filtering */
+        /* Left sidebar for sorting/filtering and search */
         .sidebar {
             width: 20%;
             padding: 20px;
             background-color: #f4f4f4;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
         }
 
         .sidebar h2 {
@@ -42,6 +43,35 @@
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Search Form Styles */
+        .search-form {
+            margin-bottom: 30px;
+        }
+
+        .search-form input,
+        .search-form select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .search-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
         }
 
         /* Main container for the map and right sidebar */
@@ -72,10 +102,13 @@
 
         .restaurant h3 {
             margin: 0;
+            font-size: 18px;
+            color: #333;
         }
 
         .restaurant p {
             margin: 5px 0;
+            color: #555;
         }
 
         /* Add some spacing for the last restaurant */
@@ -88,11 +121,13 @@
             width: 100%;
             height: 200px;
             border: none;
+            margin-top: 10px;
+            border-radius: 4px;
         }
     </style>
 
     <!-- Load the Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API&callback=initMap" async defer></script>
     <script>
         // This function initializes the map
         function initMap() {
@@ -111,28 +146,58 @@
         }
 
         // This function will handle the filtering and update the restaurant list
-        function filterRestaurants() {
-            const sortOption = document.getElementById('sort').value;
-            const cuisine = document.getElementById('cuisine').value;
-            const priceRange = document.getElementById('price-range').value;
+        function filterRestaurants(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const restaurantName = document.getElementById('restaurant-name').value.trim();
+            const cuisine = document.getElementById('search-cuisine').value;
+            const location = document.getElementById('search-location').value.trim();
 
             // Example function - Here you would apply the filter logic and update the map
-            console.log("Sorting by:", sortOption);
-            console.log("Filtering by cuisine:", cuisine);
-            console.log("Filtering by price range:", priceRange);
+            console.log("Searching for:", restaurantName);
+            console.log("Cuisine:", cuisine);
+            console.log("Location:", location);
 
-            // You'd dynamically update the map markers and the restaurant list here based on the filters
+            // TODO: Implement the logic to fetch and display filtered restaurants
+            // This could involve making an AJAX request to the server with the search parameters
+            // and then updating the map markers and restaurant list based on the response.
         }
     </script>
 </head>
 
 <body>
-    <!-- Left sidebar for filters -->
+    <!-- Left sidebar for filters and search -->
     <div class="sidebar">
+        <h2>Search Restaurants</h2>
+        <form class="search-form" onsubmit="filterRestaurants(event)">
+            <!-- Input for restaurant name -->
+            <label for="restaurant-name">Restaurant Name:</label>
+            <input type="text" id="restaurant-name" name="restaurant_name" placeholder="Enter restaurant name...">
+
+            <!-- Dropdown for cuisine type -->
+            <label for="search-cuisine">Cuisine Type:</label>
+            <select id="search-cuisine" name="cuisine_type">
+                <option value="">Any</option>
+                <option value="american">American</option>
+                <option value="italian">Italian</option>
+                <option value="asian">Asian</option>
+                <option value="mexican">Mexican</option>
+                <option value="indian">Indian</option>
+                <option value="japanese">Japanese</option>
+                <option value="thai">Thai</option>
+                <option value="french">French</option>
+                <option value="spanish">Spanish</option>
+                <!-- Add more cuisine types as needed -->
+            </select>
+
+            <!-- Enter button to submit the search -->
+            <button type="submit">Enter</button>
+        </form>
+
         <h2>Filters</h2>
         <div class="filter-group">
             <label for="sort">Sort By:</label>
-            <select id="sort" onchange="filterRestaurants()">
+            <select id="sort" onchange="filterRestaurants(event)">
                 <option value="rating">Rating</option>
                 <option value="distance">Distance</option>
                 <option value="price">Price</option>
@@ -141,18 +206,19 @@
 
         <div class="filter-group">
             <label for="cuisine">Cuisine:</label>
-            <select id="cuisine" onchange="filterRestaurants()">
+            <select id="cuisine" onchange="filterRestaurants(event)">
                 <option value="all">All</option>
                 <option value="american">American</option>
                 <option value="italian">Italian</option>
                 <option value="asian">Asian</option>
                 <option value="mexican">Mexican</option>
+                <!-- Add more cuisine types as needed -->
             </select>
         </div>
 
         <div class="filter-group">
             <label for="price-range">Price Range:</label>
-            <select id="price-range" onchange="filterRestaurants()">
+            <select id="price-range" onchange="filterRestaurants(event)">
                 <option value="all">All</option>
                 <option value="1">$</option>
                 <option value="2">$$</option>
@@ -174,23 +240,24 @@
                 <h3>Best Burgers</h3>
                 <p>American - $$</p>
                 <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Best+Burgers,Atlanta+GA"
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API&q=Best+Burgers,Atlanta+GA"
                     allowfullscreen></iframe>
             </div>
             <div class="restaurant">
                 <h3>Sushi Spot</h3>
                 <p>Asian - $$$</p>
                 <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Sushi+Spot,Atlanta+GA"
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API&q=Sushi+Spot,Atlanta+GA"
                     allowfullscreen></iframe>
             </div>
             <div class="restaurant">
                 <h3>Pasta Paradise</h3>
                 <p>Italian - $$</p>
                 <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Pasta+Paradise,Atlanta+GA"
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API&q=Pasta+Paradise,Atlanta+GA"
                     allowfullscreen></iframe>
             </div>
+            <!-- Add more restaurant entries as needed -->
         </div>
     </div>
 </body>

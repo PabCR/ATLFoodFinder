@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=_e3sow#@1xp^+lz9(y5^89w36j^^x4jx7^lm!au4a$5+2(pdp'
 
 env_path = os.path.join(BASE_DIR, 'apis.env')
-load_dotenv(env_path)
+(env_path)
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!

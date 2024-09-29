@@ -9,5 +9,6 @@ def show_map_view(request):
     embed_map_url = get_embed_map_url(location)
     
     return render(request, 'map_display.html', {'map_url': embed_map_url})
+
 def map(request):
     return render(request, 'ATLFoodFinder/map.html')

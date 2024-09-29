@@ -125,6 +125,7 @@
             border-radius: 4px;
         }
     </style>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=1.0">
 
     <!-- Load the Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&callback=initMap" async defer></script>
@@ -171,10 +172,26 @@
         <h2>Search Restaurants</h2>
         <form class="search-form" onsubmit="filterRestaurants(event)">
             <!-- Input for restaurant name -->
-            <label for="restaurant-name">Restaurant Name:</label>
-            <input type="text" id="restaurant-name" name="restaurant_name" placeholder="Enter restaurant name...">
+            <div>
+                <label for="restaurant-name">Restaurant Name:</label>
+                <input type="text" id="restaurant-name" name="restaurant_name" placeholder="Enter restaurant name...">
+            </div>
 
-            <!-- Dropdown for cuisine type -->
+            <!-- Enter button to submit the search -->
+            <button type="submit">Search</button>
+        </form>
+
+        <h2>Filters</h2>
+        <div class="filter-group">
+            <label for="sort">Sort By:</label>
+            <select id="sort" onchange="filterRestaurants(event)">
+                <option value="rating">Rating</option>
+                <option value="distance">Distance</option>
+                <option value="price">Price</option>
+            </select>
+        </div>
+
+        <div class="filter-group"><!-- Dropdown for cuisine type -->
             <label for="search-cuisine">Cuisine Type:</label>
             <select id="search-cuisine" name="cuisine_type">
                 <option value="">Any</option>
@@ -189,31 +206,6 @@
                 <option value="spanish">Spanish</option>
                 <!-- Add more cuisine types as needed -->
             </select>
-
-            <!-- Enter button to submit the search -->
-            <button type="submit">Enter</button>
-        </form>
-
-        <h2>Filters</h2>
-        <div class="filter-group">
-            <label for="sort">Sort By:</label>
-            <select id="sort" onchange="filterRestaurants(event)">
-                <option value="rating">Rating</option>
-                <option value="distance">Distance</option>
-                <option value="price">Price</option>
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="cuisine">Cuisine:</label>
-            <select id="cuisine" onchange="filterRestaurants(event)">
-                <option value="all">All</option>
-                <option value="american">American</option>
-                <option value="italian">Italian</option>
-                <option value="asian">Asian</option>
-                <option value="mexican">Mexican</option>
-                <!-- Add more cuisine types as needed -->
-            </select>
         </div>
 
         <div class="filter-group">
@@ -226,6 +218,9 @@
                 <option value="4">$$$$</option>
             </select>
         </div>
+
+            <!-- Add the home button at the bottom of the sidebar -->
+        <button class="home-btn" onclick="window.location.href='/'">Return to Home</button>
     </div>
 
     <!-- Main content area (map and restaurant list) -->

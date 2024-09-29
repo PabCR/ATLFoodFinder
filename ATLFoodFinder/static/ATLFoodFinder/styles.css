@@ -3,15 +3,20 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: white;
 }
 
 header {
-    background-color: #4CAF50;
-    color: white;
-    padding: 40px 20px;
+    background-image: url("ATLFoodFinder/images/Skyline.jpg");
+    background-size: cover; /* Ensures the image covers the entire header */
+    background-position: center; /* Centers the background image */
+    height: 300px; /* Adjust the height of the header */
+    color: white; /* Text color in the header */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    box-shadow: 0 4px 2px -2px gray;
+    padding: 20px;
 }
 
 nav {
@@ -211,4 +216,26 @@ nav ul li a {
 
 nav ul li a:hover {
     background-color: #555;
+}
+
+
+
+/* Style for the home button */
+.home-btn {
+    position: absolute;
+    bottom: 20px; /* Position at the bottom of the sidebar */
+    left: 20px; /* Slightly offset from the left */
+    width: calc(100% - 40px); /* Full width minus padding */
+    padding: 10px;
+    background-color: #28a745; /* Green color for the button */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.home-btn:hover {
+    background-color: #218838; /* Darker green on hover */
 }

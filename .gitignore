@@ -15,6 +15,7 @@
 # Python cache files
 __pycache__/
 *.py[cod]  # Ignore Python compiled files
+*.pyc
 
 # Byte-compiled / optimized / DLL files
 *.pyo
@@ -32,6 +33,7 @@ ENV/
 /db.sqlite3  # If your database file is named this
 /staticfiles/  # If you collect static files in this directory
 /media/  # If you have a media directory
+db.sqlite3
 
 # Local environment variables
 .env

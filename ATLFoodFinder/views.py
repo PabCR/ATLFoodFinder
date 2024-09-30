@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .services import get_embed_map_url
 
+
 def home(request):
     return render(request, 'ATLFoodFinder/home.html')
 
@@ -11,3 +12,6 @@ def show_map_view(request):
     return render(request, 'map_display.html', {'map_url': embed_map_url})
 def map(request):
     return render(request, 'ATLFoodFinder/map.html')
+def favorites(request):
+    return render(request, 'ATLFoodFinder/favorites.html')
+

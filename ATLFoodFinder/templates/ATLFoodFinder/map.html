@@ -145,6 +145,7 @@
             });
         }
 
+
         // This function will handle the filtering and update the restaurant list
         function filterRestaurants(event) {
             event.preventDefault(); // Prevent form submission
@@ -226,7 +227,14 @@
                 <option value="4">$$$$</option>
             </select>
         </div>
+
+    <!-- View Favorites Button -->
+            <button id="save-favorites" onclick="window.location.href = '/favorites'">
+            Saved Favorites
+            <!-- List of favorite restaurants will be injected here -->
+        </div>
     </div>
+
 
     <!-- Main content area (map and restaurant list) -->
     <div class="container">
@@ -261,9 +269,9 @@
 
                     allowfullscreen></iframe>
             </div>
-            <!-- Add more restaurant entries as needed -->
         </div>
     </div>
+
 </body>
 
 </html>

@@ -21,5 +21,6 @@ from ATLFoodFinder import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('map/', views.map, name ='map'),  # Add the home URL path
+    path('map/', views.map, name ='map'),
+    path('favorites', views.favorites, name = 'favorites')
 ]

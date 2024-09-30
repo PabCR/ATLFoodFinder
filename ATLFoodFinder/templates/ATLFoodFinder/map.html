@@ -127,13 +127,15 @@
     </style>
 
     <!-- Load the Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=initMap" async defer></script>
     <script>
+        let map;
+        let markers = [];
         // This function initializes the map
         function initMap() {
             const atlanta = { lat: 33.7490, lng: -84.3880 };
 
-            const map = new google.maps.Map(document.getElementById("map"), {
+            map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 12,
                 center: atlanta,
             });
@@ -143,8 +145,16 @@
                 map: map,
                 title: "Atlanta, GA"
             });
+
+            markers.push(marker);
         }
 
+        function clearMarkers() {
+            markers.forEach(marker => {
+                marker.setMap(null);
+            });
+            markers = [];
+        }
         // This function will handle the filtering and update the restaurant list
         function filterRestaurants(event) {
             event.preventDefault(); // Prevent form submission
@@ -153,15 +163,53 @@
             const cuisine = document.getElementById('search-cuisine').value;
             const location = document.getElementById('search-location').value.trim();
 
-            // Example function - Here you would apply the filter logic and update the map
             console.log("Searching for:", restaurantName);
             console.log("Cuisine:", cuisine);
             console.log("Location:", location);
+            // Example function - Here you would apply the filter logic and update the map
+            fetch(`/api/restaurants/?city=${location}&cuisine=${cuisine}`)
+                .then(response => response.json())
+                .then(data => {
+                    clearMarkers();
+
+                    const restaurantList = document.getElementById('restaurant-list');
+                    restaurantList.innerHTML = '';
+
+                    data.restaurants.forEach(restaurant => {
+                        const marker = new google.maps.Marker({
+                            position: {
+                                lat: restaurant.geometry.location.lat,
+                                lng: restaurant.geometry.location.lng,
+                            },
+                            map: map,
+                            title: restaurant.name,
+                        });
+                        markers.push(marker);
+
+                        const div = document.createElement('div');
+                        div.className = 'restaurant';
+                        div.innerHTML = `<h3>${restaurant.name}</h3><p>Address: ${restaurant.formatted_address}<br>Rating: ${restaurant.rating}</p>`;
+                        restaurantList.appendChild(div);
+                    });
+
+                    if (data.restaurants.length > 0) {
+                        const firstRestaurant = data.restaurants[0]
+                        map.setCenter({
+                            lat: firstRestaurant.geometry.location.lat,
+                            lng: firstRestaurant.geometry.location.lng,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error filtering fetched restaurants: ', error);
+                });
+        }
 
             // TODO: Implement the logic to fetch and display filtered restaurants
             // This could involve making an AJAX request to the server with the search parameters
             // and then updating the map markers and restaurant list based on the response.
-        }
+
+        // Event listener for the form submission to trigger the filterRestaurants function
     </script>
 </head>
 
@@ -234,7 +282,7 @@
         <div id="map"></div>
 
         <!-- Right sidebar for the restaurant list -->
-        <div class="restaurant-list">
+        <div class="restaurant-list" id="restaurant-list">
             <h2>Restaurants</h2>
             <div class="restaurant">
                 <h3>Best Burgers</h3>

@@ -21,5 +21,8 @@ from ATLFoodFinder import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('map/', views.map, name ='map'),  # Add the home URL path
+    path('map/', views.map_view, name ='map_view'),  # Add the home URL path
+    path('restaurants/', views.restaurant_list_view, name='restaurant_list_view'),
+    path('api/restaurants/', views.get_restaurants_view, name='get_restaurants'),
+    path('api/embed_map/', views.get_embed_map_view, name='get_embed_map'),
 ]

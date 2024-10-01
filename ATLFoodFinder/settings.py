@@ -12,9 +12,31 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from django.conf import settings
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Function to read the .env file
+def read_env():
+    env_file = os.path.join(BASE_DIR.parent, '/.env')
+    if os.path.exists(env_file):
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith('#') or not line.strip():
+                    continue
+                key_value = line.strip().split('=', 1)
+                if len(key_value) == 2:
+                    key, value = key_value
+                    os.environ.setdefault(key, value)
+
+# Load environment variables from the .env file
+read_env()
+
+# Read the API key from the environment
+GOOGLE_MAPS_API_KEY = 'AIzaSyAbUU9ymsC9cXD5rQ87MQewhpidfn8LYok'
+
+# Debug: Print the API key to ensure it's being read
+print(f"GOOGLE_MAPS_API_KEY: {GOOGLE_MAPS_API_KEY}")
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,8 +46,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=_e3sow#@1xp^+lz9(y5^89w36j^^x4jx7^lm!au4a$5+2(pdp'
 
 env_path = os.path.join(BASE_DIR, 'apis.env')
-(env_path)
-GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -121,7 +141,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "ATLFoodFinder/static"),
     'ATLFoodFinder/static/ATLFoodFinder/',
 ]
 # Default primary key field type

@@ -1,68 +1,58 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">  
+    {% load static %}
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATLFoodFinder</title>
     <style>
         /* General Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
             height: 100vh;
+            overflow: hidden; /* Prevent scrolling */
         }
 
-        /* Left sidebar for sorting/filtering and search */
+        /* Parent container to hold the sidebar and main content */
+        .main-container {
+            display: flex;
+            height: 100%;
+        }
+
+        /* Sidebar for filters and search */
         .sidebar {
-            width: 20%;
+            width: 300px; /* Fixed width for consistency */
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #fafafa;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
         }
 
         .sidebar h2 {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            color: #333;
         }
 
-        .filter-group {
-            margin-bottom: 20px;
+        .sidebar label {
+            font-weight: bold;
+            margin-top: 10px;
         }
 
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .filter-group select,
-        .filter-group input {
+        .sidebar select,
+        .sidebar input {
             width: 100%;
             padding: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
-        /* Search Form Styles */
-        .search-form {
-            margin-bottom: 30px;
-        }
-
-        .search-form input,
-        .search-form select {
+        .sidebar button {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-
-        .search-form button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+            padding: 12px;
+            background-color: #28a745; /* Green color */
             color: white;
             border: none;
             border-radius: 4px;
@@ -70,200 +60,490 @@
             font-size: 16px;
         }
 
-        .search-form button:hover {
-            background-color: #0056b3;
+        .sidebar button:hover {
+            background-color: #218838;
         }
 
-        /* Main container for the map and right sidebar */
+        /* Main content area (map and restaurant list) */
         .container {
             display: flex;
             flex-grow: 1;
+            height: 100%;
         }
 
         /* Map container */
         #map {
             flex-grow: 1;
-            height: 100vh;
+            height: 100%;
         }
 
         /* Right sidebar for restaurant listings */
         .restaurant-list {
-            width: 20%;
+            width: 300px; /* Fixed width for consistency */
             padding: 20px;
-            background-color: #fff;
+            background-color: #ffffff;
             box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
         }
 
+        .restaurant-list h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
         .restaurant {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .restaurant:hover {
+            background-color: #f9f9f9;
+        }
+
+        .restaurant.selected {
+            background-color: #e0f7fa; /* Light cyan background */
         }
 
         .restaurant h3 {
             margin: 0;
-            font-size: 18px;
-            color: #333;
+            font-size: 20px;
+            color: #007bff;
         }
 
         .restaurant p {
             margin: 5px 0;
             color: #555;
-        }
-
-        /* Add some spacing for the last restaurant */
-        .restaurant:last-child {
-            border-bottom: none;
-        }
-
-        /* Styling for the iframe (embed map) */
-        iframe {
-            width: 100%;
-            height: 200px;
-            border: none;
-            margin-top: 10px;
-            border-radius: 4px;
+            font-size: 14px;
         }
     </style>
 
     <!-- Load the Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places,geometry&callback=initMap" async defer></script>
+
     <script>
-        // This function initializes the map
+        // Global variables
+        let map;
+        let service;
+        let infowindow;
+        const googleMapsApiKey = '{{ google_maps_api_key|escapejs }}'; // Read from template variable
+        console.log("{{google_maps_api_key|escapejs}}")
+        let markers = {}; // Object to store markers with place_id as keys
+        let lastHighlightedMarker = null;
+
+        /**
+         * Initializes the Google Map.
+         */
         function initMap() {
             const atlanta = { lat: 33.7490, lng: -84.3880 };
 
-            const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 12,
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 14,
                 center: atlanta,
+                mapId: 'ace3d04f17040000' // Add your generated Map ID here
             });
 
-            const marker = new google.maps.Marker({
-                position: atlanta,
-                map: map,
-                title: "Atlanta, GA"
+            service = new google.maps.places.PlacesService(map);
+            infowindow = new google.maps.InfoWindow();
+
+            // Perform an initial search
+            performSearch();
+        }
+
+        /**
+         * Performs a search for restaurants based on the provided filters.
+         * @param {Object} filters - The filters to apply to the search.
+         */
+         function performSearch(filters = {}) {
+            // Build the keyword parameter
+            let keywords = [];
+        
+            // Include the restaurant name if provided
+            if (filters.restaurantName) {
+                keywords.push(filters.restaurantName);
+            }
+        
+            // Include the cuisine type if provided
+            if (filters.cuisine && filters.cuisine !== '') {
+                keywords.push(filters.cuisine);
+            }
+        
+            // Combine keywords into a single string
+            const keywordString = keywords.join(' ');
+        
+            const request = {
+                location: map.getCenter(),
+                radius: '10000',
+                type: ['restaurant'],
+                keyword: keywordString || '',
+            };
+        
+            // Apply price range filtering
+            if (filters.priceRange && filters.priceRange !== 'all') {
+                request.minPriceLevel = parseInt(filters.priceRange);
+                request.maxPriceLevel = parseInt(filters.priceRange);
+            }
+        
+            // Clear existing markers before performing a new search
+            clearMarkers();
+        
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    // Sort the results based on the selected sortOption
+                    let sortedResults = sortResults(results, filters.sortOption);
+        
+                    clearRestaurants(); // Clear restaurant list
+        
+                    // Display the sorted and filtered results
+                    sortedResults.forEach(result => {
+                        createMarker(result); // Create new markers
+                        addRestaurantToSidebar(result); // Add restaurants to sidebar
+                    });
+                }
+            });
+        }
+        
+
+        /**
+         * Applies additional filters to the results.
+         * @param {Array} results - The results from the Places API.
+         * @param {Object} filters - The filters to apply.
+         * @returns {Array} - The filtered results.
+         */
+        function applyAdditionalFilters(results, filters) {
+            return results.filter(place => {
+                // Filter by cuisine type if specified
+                if (filters.cuisine && filters.cuisine !== '') {
+                    if (!place.types.includes(filters.cuisine)) {
+                        return false;
+                    }
+                }
+
+                // Additional filters can be added here
+                // Note: The Places API may not provide properties like hasDelivery, hasWifi, etc.
+                // Implementing these would require additional API calls or data sources.
+
+                return true; // Include the place if all filters pass
             });
         }
 
-        // This function will handle the filtering and update the restaurant list
+        /**
+         * Sorts the results based on the selected sort option.
+         * @param {Array} results - The results to sort.
+         * @param {String} sortOption - The sort option selected.
+         * @returns {Array} - The sorted results.
+         */
+        function sortResults(results, sortOption) {
+            let sortedResults = results.slice(); // Create a shallow copy
+
+            if (sortOption === 'rating') {
+                // Sort by rating descending
+                sortedResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            } else if (sortOption === 'price') {
+                // Sort by price_level ascending
+                sortedResults.sort((a, b) => (a.price_level || 0) - (b.price_level || 0));
+            } else if (sortOption === 'name') {
+                // Sort by name ascending
+                sortedResults.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            return sortedResults;
+        }
+
+        /**
+         * Creates a marker for a restaurant on the map.
+         * @param {Object} place - The place object from the Places API.
+         */
+        async function createMarker(place) {
+            const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+
+            const pinElement = new PinElement({
+                background: '#ff0000',
+                borderColor: '#000000',
+                glyph: '🍴',
+                glyphColor: '#000000',
+                scale: 1.5
+            });
+
+            const marker = new AdvancedMarkerElement({
+                map: map,
+                position: place.geometry.location,
+                title: place.name,
+                content: pinElement.element,
+                gmpDraggable: false,
+                zIndex: 1
+            });
+
+            // Store the marker in the markers object using place_id as the key
+            markers[place.place_id] = marker;
+
+            // Add a click listener for the marker
+            marker.addEventListener('click', () => {
+                highlightMarker(place.place_id);
+                infowindow.setContent(`
+                    <strong>${place.name}</strong><br>
+                    Rating: ${place.rating} (${place.user_ratings_total} reviews)<br>
+                    Price Level: ${getPriceLevel(place.price_level)}
+                `);
+                infowindow.open(map, marker);
+            });
+        }
+
+        /**
+         * Clears all markers from the map.
+         */
+        function clearMarkers() {
+            for (let key in markers) {
+                markers[key].map = null; // Remove the marker from the map
+            }
+            markers = {}; // Reset the markers object
+            lastHighlightedMarker = null;
+        }
+
+        /**
+         * Highlights the selected marker and updates the sidebar.
+         * @param {String} placeId - The place_id of the selected restaurant.
+         */
+        async function highlightMarker(placeId) {
+            const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+
+            // Reset the last highlighted marker
+            if (lastHighlightedMarker && markers[lastHighlightedMarker]) {
+                const defaultPin = new PinElement({
+                    background: '#ff0000',
+                    borderColor: '#000000',
+                    glyph: '🍴',
+                    glyphColor: '#000000',
+                    scale: 1.5
+                });
+                markers[lastHighlightedMarker].content = defaultPin.element;
+            }
+
+            // Highlight the selected marker
+            const highlightedPin = new PinElement({
+                background: '#00ff00', // Change color to indicate selection
+                borderColor: '#000000',
+                glyph: '🍴',
+                glyphColor: '#000000',
+                scale: 1.8 // Slightly larger
+            });
+
+            markers[placeId].content = highlightedPin.element;
+            lastHighlightedMarker = placeId;
+
+            // Add 'selected' class to the corresponding sidebar entry
+            highlightSidebarEntry(placeId);
+        }
+
+        /**
+         * Highlights the selected restaurant in the sidebar.
+         * @param {String} placeId - The place_id of the selected restaurant.
+         */
+        function highlightSidebarEntry(placeId) {
+            // Remove 'selected' class from previously selected restaurant
+            const previousSelected = document.querySelector('.restaurant.selected');
+            if (previousSelected) {
+                previousSelected.classList.remove('selected');
+            }
+
+            // Add 'selected' class to the current restaurant
+            const currentRestaurantDiv = document.querySelector(`.restaurant[data-place-id="${placeId}"]`);
+            if (currentRestaurantDiv) {
+                currentRestaurantDiv.classList.add('selected');
+            }
+        }
+
+        /**
+         * Clears the restaurant list from the sidebar.
+         */
+        function clearRestaurants() {
+            const sidebar = document.querySelector('.restaurant-list');
+            sidebar.innerHTML = '<h2>Restaurants</h2>';
+        }
+
+        /**
+         * Adds a restaurant to the sidebar list.
+         * @param {Object} place - The place object from the Places API.
+         */
+        function addRestaurantToSidebar(place) {
+            const sidebar = document.querySelector('.restaurant-list');
+            const restaurantDiv = document.createElement('div');
+            restaurantDiv.classList.add('restaurant');
+
+            // Assign the place_id to the div for reference
+            restaurantDiv.dataset.placeId = place.place_id;
+
+            // Get the additional details (Note: These may not be available from the Places API)
+            const hasDelivery = place.hasDelivery ? 'Delivery Available' : 'No Delivery';
+            const hasWifi = place.hasWifi ? 'WiFi Available' : 'No WiFi';
+            const servesBeer = place.servesBeer ? 'Serves Beer' : 'No Beer';
+            const servesLunch = place.servesLunch ? 'Serves Lunch' : 'No Lunch';
+            const servesDinner = place.servesDinner ? 'Serves Dinner' : 'No Dinner';
+
+            restaurantDiv.innerHTML = `
+                <h3>${place.name}</h3>
+                <p>${place.vicinity} - ${getPriceLevel(place.price_level)}</p>
+                <p>Rating: ${place.rating} (${place.user_ratings_total} reviews)</p>
+                <p>${hasDelivery}, ${hasWifi}, ${servesBeer}, ${servesLunch}, ${servesDinner}</p>
+            `;
+
+            // Add click event listener to highlight the marker
+            restaurantDiv.addEventListener('click', () => {
+                highlightMarker(place.place_id);
+                // Pan the map to the marker's position
+                map.panTo(place.geometry.location);
+                map.setZoom(16); // Zoom in for a closer view
+            });
+
+            sidebar.appendChild(restaurantDiv);
+        }
+
+        /**
+         * Converts the price level to a readable format.
+         * @param {Number} priceLevel - The price level from the Places API.
+         * @returns {String} - The formatted price level.
+         */
+        function getPriceLevel(priceLevel) {
+            if (!priceLevel) return 'N/A';
+            return '$'.repeat(priceLevel); // E.g., returns $$ for price level 2
+        }
+
+        /**
+         * Handles the filtering and updates the map and sidebar.
+         * @param {Event} event - The event object.
+         */
         function filterRestaurants(event) {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault();
 
             const restaurantName = document.getElementById('restaurant-name').value.trim();
             const cuisine = document.getElementById('search-cuisine').value;
-            const location = document.getElementById('search-location').value.trim();
+            const sortOption = document.getElementById('sort').value;
+            const priceRange = document.getElementById('price-range').value;
+            const hasDelivery = document.getElementById('has-delivery').value;
+            const hasWifi = document.getElementById('has-wifi').value;
+            const servesBeer = document.getElementById('serves-beer').value;
+            const hasOutdoorSeating = document.getElementById('has-outdoor-seating').value;
+            const isGoodForChildren = document.getElementById('is-good-for-children').value;
 
-            // Example function - Here you would apply the filter logic and update the map
-            console.log("Searching for:", restaurantName);
-            console.log("Cuisine:", cuisine);
-            console.log("Location:", location);
-
-            // TODO: Implement the logic to fetch and display filtered restaurants
-            // This could involve making an AJAX request to the server with the search parameters
-            // and then updating the map markers and restaurant list based on the response.
+            // Perform the search with the applied filters
+            performSearch({
+                restaurantName,
+                cuisine,
+                sortOption,
+                priceRange,
+                hasDelivery,
+                hasWifi,
+                servesBeer,
+                hasOutdoorSeating,
+                isGoodForChildren
+            });
         }
     </script>
 </head>
-
 <body>
-    <!-- Left sidebar for filters and search -->
-    <div class="sidebar">
-        <h2>Search Restaurants</h2>
-        <form class="search-form" onsubmit="filterRestaurants(event)">
-            <!-- Input for restaurant name -->
-            <label for="restaurant-name">Restaurant Name:</label>
-            <input type="text" id="restaurant-name" name="restaurant_name" placeholder="Enter restaurant name...">
+    <!-- Parent container to hold the sidebar and main content -->
+    <div class="main-container">
+        <!-- Sidebar for filters and search -->
+        <div class="sidebar">
+            <h2>Search Restaurants</h2>
+            <form class="search-form" onsubmit="filterRestaurants(event)">
+                <!-- Input for restaurant name -->
+                <label for="restaurant-name">Restaurant Name:</label>
+                <input type="text" id="restaurant-name" name="restaurant_name" placeholder="Enter restaurant name...">
 
-            <!-- Dropdown for cuisine type -->
-            <label for="search-cuisine">Cuisine Type:</label>
-            <select id="search-cuisine" name="cuisine_type">
-                <option value="">Any</option>
-                <option value="american">American</option>
-                <option value="italian">Italian</option>
-                <option value="asian">Asian</option>
-                <option value="mexican">Mexican</option>
-                <option value="indian">Indian</option>
-                <option value="japanese">Japanese</option>
-                <option value="thai">Thai</option>
-                <option value="french">French</option>
-                <option value="spanish">Spanish</option>
-                <!-- Add more cuisine types as needed -->
-            </select>
+                <!-- Dropdown for filters -->
+                <h2>Filters</h2>
 
-            <!-- Enter button to submit the search -->
-            <button type="submit">Enter</button>
-        </form>
+                <!-- Dropdown for cuisine type -->
+                <label for="search-cuisine">Cuisine Type:</label>
+                <select id="search-cuisine" name="cuisine_type">
+                    <option value="">Any</option>
+                    <option value="american">American</option>
+                    <option value="italian">Italian</option>
+                    <option value="asian">Asian</option>
+                    <option value="mexican">Mexican</option>
+                    <option value="indian">Indian</option>
+                    <option value="japanese">Japanese</option>
+                    <option value="thai">Thai</option>
+                    <option value="french">French</option>
+                    <option value="spanish">Spanish</option>
+                </select>
 
-        <h2>Filters</h2>
-        <div class="filter-group">
-            <label for="sort">Sort By:</label>
-            <select id="sort" onchange="filterRestaurants(event)">
-                <option value="rating">Rating</option>
-                <option value="distance">Distance</option>
-                <option value="price">Price</option>
-            </select>
+                <!-- Dropdown for price range -->
+                <label for="price-range">Price Range:</label>
+                <select id="price-range">
+                    <option value="all">All</option>
+                    <option value="1">Free</option>
+                    <option value="2">Inexpensive</option>
+                    <option value="3">Moderate</option>
+                    <option value="4">Expensive</option>
+                    <option value="5">Very Expensive</option>
+                </select>
+
+                <!-- Dropdown for hasDelivery -->
+                <label for="has-delivery">Delivery Available:</label>
+                <select id="has-delivery">
+                    <option value="">Any</option>
+                    <option value="true">Available</option>
+                    <option value="false">Not Available</option>
+                </select>
+
+                <!-- Dropdown for hasWiFi -->
+                <label for="has-wifi">WiFi Availability:</label>
+                <select id="has-wifi">
+                    <option value="">Any</option>
+                    <option value="true">Available</option>
+                    <option value="false">Not Available</option>
+                </select>
+
+                <!-- Dropdown for servesBeer -->
+                <label for="serves-beer">Serves Beer:</label>
+                <select id="serves-beer">
+                    <option value="">Any</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+
+                <!-- Dropdown for hasOutdoorSeating -->
+                <label for="has-outdoor-seating">Outdoor Seating:</label>
+                <select id="has-outdoor-seating">
+                    <option value="">Any</option>
+                    <option value="true">Available</option>
+                    <option value="false">Not Available</option>
+                </select>
+
+                <!-- Dropdown for isGoodForChildren -->
+                <label for="is-good-for-children">Good for Children:</label>
+                <select id="is-good-for-children">
+                    <option value="">Any</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+
+                <!-- Dropdown for sort options -->
+                <label for="sort">Sort By:</label>
+                <select id="sort">
+                    <option value="rating">Rating</option>
+                    <option value="price">Price</option>
+                    <option value="name">Name</option>
+                </select>
+
+                <!-- Submit Button -->
+                <button type="submit">Search</button>
+            </form>
         </div>
 
-        <div class="filter-group">
-            <label for="cuisine">Cuisine:</label>
-            <select id="cuisine" onchange="filterRestaurants(event)">
-                <option value="all">All</option>
-                <option value="american">American</option>
-                <option value="italian">Italian</option>
-                <option value="asian">Asian</option>
-                <option value="mexican">Mexican</option>
-                <!-- Add more cuisine types as needed -->
-            </select>
-        </div>
+        <!-- Main content area (map and restaurant list) -->
+        <div class="container">
+            <!-- Google Maps container -->
+            <div id="map"></div>
 
-        <div class="filter-group">
-            <label for="price-range">Price Range:</label>
-            <select id="price-range" onchange="filterRestaurants(event)">
-                <option value="all">All</option>
-                <option value="1">$</option>
-                <option value="2">$$</option>
-                <option value="3">$$$</option>
-                <option value="4">$$$$</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Main content area (map and restaurant list) -->
-    <div class="container">
-        <!-- Google Maps container -->
-        <div id="map"></div>
-
-        <!-- Right sidebar for the restaurant list -->
-        <div class="restaurant-list">
-            <h2>Restaurants</h2>
-            <div class="restaurant">
-                <h3>Best Burgers</h3>
-                <p>American - $$</p>
-                <iframe
-
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&q=Best+Burgers,Atlanta+GA"
-
-                    allowfullscreen></iframe>
+            <!-- Right sidebar for the restaurant list -->
+            <div class="restaurant-list">
+                <h2>Restaurants</h2>
+                <!-- The restaurants will be added here dynamically via JavaScript -->
             </div>
-            <div class="restaurant">
-                <h3>Sushi Spot</h3>
-                <p>Asian - $$$</p>
-                <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&q=Sushi+Spot,Atlanta+GA"
-
-                    allowfullscreen></iframe>
-            </div>
-            <div class="restaurant">
-                <h3>Pasta Paradise</h3>
-                <p>Italian - $$</p>
-                <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&q=Pasta+Paradise,Atlanta+GA"
-
-                    allowfullscreen></iframe>
-            </div>
-            <!-- Add more restaurant entries as needed -->
         </div>
     </div>
 </body>
-
 </html>

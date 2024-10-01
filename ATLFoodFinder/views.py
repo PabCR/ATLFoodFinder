@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .services import get_embed_map_url
+from django.conf import settings
 
 def home(request):
     return render(request, 'ATLFoodFinder/home.html')
@@ -10,4 +11,10 @@ def show_map_view(request):
     
     return render(request, 'map_display.html', {'map_url': embed_map_url})
 def map(request):
-    return render(request, 'ATLFoodFinder/map.html')
+    context = {
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+    }
+    print(context)
+    return render(request, 'ATLFoodFinder/map.html', context)
+
+from django.conf import settings

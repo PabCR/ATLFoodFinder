@@ -26,7 +26,7 @@ from .views import CustomPasswordResetConfirmView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('login/', auth_views.LoginView.as_view(template_name='ATLFoodFinder/login.html', authentication_form=CustomLoginForm), name='login'),
+    path('login/', auth_views.LoginView.as_view(template_name='ATLFoodFinder/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),

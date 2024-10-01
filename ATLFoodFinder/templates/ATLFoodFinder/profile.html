@@ -6,6 +6,20 @@
     <title>Profile - ATLFoodFinder</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script>
+        // Script to toggle password field visibility
+        function togglePasswordField() {
+            var passwordField = document.getElementById("password-field");
+            var changeButton = document.getElementById("change-password-button");
+            if (passwordField.style.display === "none") {
+                passwordField.style.display = "block";
+                changeButton.innerText = "Cancel";
+            } else {
+                passwordField.style.display = "none";
+                changeButton.innerText = "Change Password";
+            }
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -25,6 +39,25 @@
             <div class="restaurant-card">
                 <h3>Welcome, {{ user.username }}!</h3>
                 <p>This is your profile page where you can manage your data.</p>
+
+                <!-- Profile Update Form -->
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <label for="email">Email (Username):</label>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                    
+                    <!-- Toggle Password Change -->
+                    <button type="button" id="change-password-button" class="view-business-btn" onclick="togglePasswordField()">Change Password</button>
+
+                    <!-- Password input field, hidden by default -->
+                    <div id="password-field" style="display: none;">
+                        <label for="password">New Password:</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+
+                    <button type="submit" class="view-business-btn">Update Profile</button>
+                </form>
 
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}

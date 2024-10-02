@@ -18,7 +18,7 @@
             {% if user.is_authenticated %}
             <li><a href="{% url 'profile' %}">Profile</a></li>
             <li>
-                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                <form method="POST" action="{% url 'logout' %}" style=body>
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>

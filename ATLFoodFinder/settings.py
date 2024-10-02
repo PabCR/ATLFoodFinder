@@ -10,10 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 from django.conf import settings
 
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Function to read the .env file
@@ -38,23 +39,42 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyAbUU9ymsC9cXD5rQ87MQewhpidfn8LYok'
 # Debug: Print the API key to ensure it's being read
 print(f"GOOGLE_MAPS_API_KEY: {GOOGLE_MAPS_API_KEY}")
 
+# Function to read the .env file
+def read_env():
+    env_file = os.path.join(BASE_DIR.parent, '/.env')
+    if os.path.exists(env_file):
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith('#') or not line.strip():
+                    continue
+                key_value = line.strip().split('=', 1)
+                if len(key_value) == 2:
+                    key, value = key_value
+                    os.environ.setdefault(key, value)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# Load environment variables from the .env file
+read_env()
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# Read the API key from the environment
+GOOGLE_MAPS_API_KEY = 'AIzaSyAbUU9ymsC9cXD5rQ87MQewhpidfn8LYok'
+
+# Debug: Print the API key to ensure it's being read
+print(f"GOOGLE_MAPS_API_KEY: {GOOGLE_MAPS_API_KEY}")
+
+# Secret key (ensure this is kept secret in production)
 SECRET_KEY = 'django-insecure-=_e3sow#@1xp^+lz9(y5^89w36j^^x4jx7^lm!au4a$5+2(pdp'
 
 env_path = os.path.join(BASE_DIR, 'apis.env')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+env_path = os.path.join(BASE_DIR, 'apis.env')
+
+# Debug setting
 DEBUG = True
 
+# Allowed hosts (adjust this for production)
 ALLOWED_HOSTS = []
 
-
-# Application definition
-
+# Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,8 +82,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ATLFoodFinder',  # Your app
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -74,12 +96,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# URL configuration
 ROOT_URLCONF = 'ATLFoodFinder.urls'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'ATLFoodFinder/templates'],  # You can leave this empty or point it to a global template folder if needed
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,12 +116,10 @@ TEMPLATES = [
     },
 ]
 
+# WSGI application
 WSGI_APPLICATION = 'ATLFoodFinder.wsgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -105,10 +127,7 @@ DATABASES = {
     }
 }
 
-
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -124,27 +143,43 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    'ATLFoodFinder.backends.EmailBackend',  # Custom email backend for login
+]
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
+# Custom user model (if applicable)
+# AUTH_USER_MODEL = 'your_custom_user_model'
 
+# Language and timezone
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+# Static files
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Media files (if applicable)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "ATLFoodFinder/static"),
     'ATLFoodFinder/static/ATLFoodFinder/',
 ]
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email backend (console backend for testing)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Login and logout redirect URLs
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'  # Ensures users are redirected to home after logout
+
+# Custom password reset settings (adjust email templates if needed)
+PASSWORD_RESET_TIMEOUT_DAYS = 1

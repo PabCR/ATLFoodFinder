@@ -7,7 +7,7 @@ html, body {
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: #0CAF50;
     color: white;
     padding: 40px 20px;
     text-align: center;
@@ -83,7 +83,7 @@ main h2 {
 
 .restaurant-card h3 {
     margin-top: 0;
-    color: #4CAF50;
+    color: #0CAF50;
 }
 
 .restaurant-card p {
@@ -95,7 +95,7 @@ main h2 {
     width: 100%;
     padding: 10px;
     text-align: center;
-    background-color: #4CAF50;
+    background-color: #0CAF50;
     color: white;
     text-decoration: none;
     font-weight: bold;
@@ -126,7 +126,7 @@ h2 {
 }
 
 h3 {
-    color: #4CAF50;
+    color: #0CAF50;
     font-size: 28px;
     margin-top: 0;
 }
@@ -148,8 +148,8 @@ form input {
 }
 
 button {
+    background-color: #0CAF50;
     padding: 10px;
-    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -167,8 +167,11 @@ p {
 }
 
 p a {
-    color: #4CAF50;
+    color: #0CAF50;
     text-decoration: none;
+}
+.logout{
+    color: red
 }
 
 p a:hover {
@@ -204,4 +207,21 @@ nav ul li a {
 
 nav ul li a:hover {
     background-color: #555;
+}
+
+/* Make the logout button look like a link */
+nav ul li form button {
+    font: inherit; /* Use the same font as the links */
+    font-style: inherit;
+    font-weight: bold;
+    background-color: transparent; /* Match the background of the nav */
+    color: white;    
+    border: none; /* Remove default button border */
+    border-radius: 5px; /* Match the border radius of the other links */
+    cursor: pointer; /* Keep the pointer cursor for the button */
+}
+
+/* Add hover effect to the button */
+nav ul li form button:hover {
+    background-color: #555; /* Same hover effect as links */
 }

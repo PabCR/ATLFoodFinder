@@ -4,145 +4,16 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
     <title>ATLFoodFinder</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden; /* Prevent scrolling */
-        }
-
-        /* Parent container to hold the sidebar and main content */
-        .main-container {
-            display: flex;
-            height: 100%;
-        }
-
-        /* Sidebar for filters and search */
-        .sidebar {
-            width: 300px; /* Fixed width for consistency */
-            padding: 20px;
-            background-color: #fafafa;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-        }
-
-        .sidebar h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .sidebar label {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .sidebar select,
-        .sidebar input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .sidebar button {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745; /* Green color */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .sidebar button:hover {
-            background-color: #218838;
-        }
-
-        /* Main content area (map and restaurant list) */
-        .container {
-            display: flex;
-            flex-grow: 1;
-            height: 100%;
-        }
-
-        /* Map container */
-        #map {
-            flex-grow: 1;
-            height: 100%;
-        }
-
-        /* Right sidebar for restaurant listings */
-        .restaurant-list {
-            width: 300px; /* Fixed width for consistency */
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-        }
-
-        .restaurant-list h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .restaurant {
-            border-bottom: 1px solid #eee;
-            padding: 15px 0;
-            cursor: pointer;
-        }
-
-        .restaurant:hover {
-            background-color: #f9f9f9;
-        }
-
-        .restaurant.selected {
-            background-color: #e0f7fa; /* Light cyan background */
-        }
-
-        .restaurant h3 {
-            margin: 0;
-            font-size: 20px;
-            color: #007bff;
-        }
-
-        .restaurant p {
-            margin: 5px 0;
-            color: #555;
-        }
-
-        /* Add some spacing for the last restaurant */
-        .restaurant:last-child {
-            border-bottom: none;
-        }
-        .restaurant-list {
-            width: 20%;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-        }
-
-        /* Styling for the iframe (embed map) */
-        iframe {
-            width: 100%;
-            height: 200px;
-            border: none;
-            margin-top: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-    </style>
 
     <!-- Load the Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places,geometry&callback=initMap" async defer></script>
 
     <script>
+        const csrfToken = '{{ csrf_token }}'; // Read from template variable
+        const userFavorites = {{ favorites|safe }};
+        console.log('User Favorites:', userFavorites);
         // Global variables
         let map;
         let service;
@@ -155,21 +26,28 @@
         /**
          * Initializes the Google Map.
          */
-        function initMap() {
+         function initMap() {
+            // Check if the map is already initialized
+            if (window.mapInitialized) {
+                return;
+            }
+            window.mapInitialized = true;
+        
             const atlanta = { lat: 33.7490, lng: -84.3880 };
-
+        
             map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 14,
                 center: atlanta,
                 mapId: 'ace3d04f17040000' // Add your generated Map ID here
             });
-
+        
             service = new google.maps.places.PlacesService(map);
             infowindow = new google.maps.InfoWindow();
-
+        
             // Perform an initial search
             performSearch();
         }
+        
 
         /**
          * Performs a search for restaurants based on the provided filters.
@@ -194,7 +72,7 @@
         
             const request = {
                 location: map.getCenter(),
-                radius: '10000',
+                radius: '5000',
                 type: ['restaurant'],
                 keyword: keywordString || '',
             };
@@ -275,9 +153,9 @@
          * Creates a marker for a restaurant on the map.
          * @param {Object} place - The place object from the Places API.
          */
-        async function createMarker(place) {
+         async function createMarker(place) {
             const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-
+        
             const pinElement = new PinElement({
                 background: '#ff0000',
                 borderColor: '#000000',
@@ -285,7 +163,7 @@
                 glyphColor: '#000000',
                 scale: 1.5
             });
-
+        
             const marker = new AdvancedMarkerElement({
                 map: map,
                 position: place.geometry.location,
@@ -294,21 +172,27 @@
                 gmpDraggable: false,
                 zIndex: 1
             });
-
+        
             // Store the marker in the markers object using place_id as the key
             markers[place.place_id] = marker;
-
-            // Add a click listener for the marker
-            marker.addEventListener('click', () => {
+        
+            // Add a click listener to the marker's DOM element
+            marker.element.addEventListener('click', () => {
                 highlightMarker(place.place_id);
+        
+                // Safely handle undefined properties
+                const rating = place.rating || 'N/A';
+                const userRatingsTotal = place.user_ratings_total || 0;
+        
                 infowindow.setContent(`
                     <strong>${place.name}</strong><br>
-                    Rating: ${place.rating} (${place.user_ratings_total} reviews)<br>
+                    Rating: ${rating} (${userRatingsTotal} reviews)<br>
                     Price Level: ${getPriceLevel(place.price_level)}
                 `);
                 infowindow.open(map, marker);
             });
         }
+        
 
         /**
          * Clears all markers from the map.
@@ -394,26 +278,45 @@
             // Assign the place_id to the div for reference
             restaurantDiv.dataset.placeId = place.place_id;
 
-            // Get the additional details (Note: These may not be available from the Places API)
-            const hasDelivery = place.hasDelivery ? 'Delivery Available' : 'No Delivery';
-            const hasWifi = place.hasWifi ? 'WiFi Available' : 'No WiFi';
-            const servesBeer = place.servesBeer ? 'Serves Beer' : 'No Beer';
-            const servesLunch = place.servesLunch ? 'Serves Lunch' : 'No Lunch';
-            const servesDinner = place.servesDinner ? 'Serves Dinner' : 'No Dinner';
+            // Get the cuisine types
+            const knownCuisines = ['american', 'italian', 'asian', 'mexican', 'indian', 'japanese', 'thai', 'french', 'spanish'];
+            const cuisineTypes = place.types
+                .filter(type => knownCuisines.includes(type))
+                .map(type => capitalizeFirstLetter(type))
+                .join(', ');
+
+            // Safely handle undefined properties
+            const rating = place.rating || 'N/A';
+            const userRatingsTotal = place.user_ratings_total || 0;
+
+            // Ensure userFavorites is defined and is an array
+            const userFavorites = window.userFavorites || [];
+
+            // Determine if the restaurant is already favorited
+            const isFavorited = userFavorites.includes(place.place_id);
 
             restaurantDiv.innerHTML = `
                 <h3>${place.name}</h3>
                 <p>${place.vicinity} - ${getPriceLevel(place.price_level)}</p>
-                <p>Rating: ${place.rating} (${place.user_ratings_total} reviews)</p>
-                <p>${hasDelivery}, ${hasWifi}, ${servesBeer}, ${servesLunch}, ${servesDinner}</p>
+                <p>Cuisine: ${cuisineTypes || 'Not specified'}</p>
+                <p>Rating: ${rating} (${userRatingsTotal} reviews)</p>
+                <button class="save-favorite-btn"
+                    data-place-id="${encodeURIComponent(place.place_id)}"
+                    data-name="${encodeURIComponent(place.name)}"
+                    data-address="${encodeURIComponent(place.vicinity)}"
+                    ${isFavorited ? 'disabled' : ''}>
+                    ${isFavorited ? 'Saved' : 'Save to Favorites'}
+                </button>
             `;
 
             // Add click event listener to highlight the marker
-            restaurantDiv.addEventListener('click', () => {
-                highlightMarker(place.place_id);
-                // Pan the map to the marker's position
-                map.panTo(place.geometry.location);
-                map.setZoom(16); // Zoom in for a closer view
+            restaurantDiv.addEventListener('click', (event) => {
+                // Prevent the event from firing when clicking the "Save to Favorites" button
+                if (!event.target.classList.contains('save-favorite-btn')) {
+                    highlightMarker(place.place_id);
+                    map.panTo(place.geometry.location);
+                    map.setZoom(16);
+                }
             });
 
             sidebar.appendChild(restaurantDiv);
@@ -440,11 +343,6 @@
             const cuisine = document.getElementById('search-cuisine').value;
             const sortOption = document.getElementById('sort').value;
             const priceRange = document.getElementById('price-range').value;
-            const hasDelivery = document.getElementById('has-delivery').value;
-            const hasWifi = document.getElementById('has-wifi').value;
-            const servesBeer = document.getElementById('serves-beer').value;
-            const hasOutdoorSeating = document.getElementById('has-outdoor-seating').value;
-            const isGoodForChildren = document.getElementById('is-good-for-children').value;
 
             // Perform the search with the applied filters
             performSearch({
@@ -452,19 +350,89 @@
                 cuisine,
                 sortOption,
                 priceRange,
-                hasDelivery,
-                hasWifi,
-                servesBeer,
-                hasOutdoorSeating,
-                isGoodForChildren
             });
         }
+        // Event delegation for dynamically added "Save to Favorites" buttons
+        document.addEventListener('click', function(event) {
+            if (event.target && event.target.classList.contains('save-favorite-btn')) {
+                event.stopPropagation(); // Prevent triggering parent event listeners
+                const button = event.target;
+                const placeId = button.dataset.placeId;
+                const name = decodeURIComponent(button.dataset.name);
+                const address = decodeURIComponent(button.dataset.address);
+                saveToFavorites(placeId, name, address, button);
+            }
+        });
+
+        function saveToFavorites(placeId, name, address, button) {
+            fetch('/save_favorite/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken // Ensure CSRF token is included
+                },
+                body: JSON.stringify({ place_id: placeId, name: name, address: address })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Restaurant added to your favorites!');
+                    button.textContent = 'Saved';
+                    button.disabled = true;
+                } else if (data.status === 'exists') {
+                    alert('This restaurant is already in your favorites.');
+                    button.textContent = 'Saved';
+                    button.disabled = true;
+                } else if (data.status === 'unauthenticated') {
+                    alert('You need to be logged in to save favorites.');
+                    window.location.href = '/login/'; // Redirect to login page
+                } else {
+                    alert('An error occurred while saving the restaurant.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the restaurant.');
+            });
+        }
+
+        window.addEventListener('pageshow', function(event) {
+            // If the page was restored from the cache, re-initialize the map
+            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                // Re-initialize the map
+                initMap();
+            }
+        });
     </script>
 </head>
-<body>
-    <!-- Parent container to hold the sidebar and main content -->
+<body class="map-page">
+    <!-- Header with Navigation Bar -->
+    <header>
+        <h1>ATLFoodFinder</h1>
+    </header>
+    <nav>
+        <ul>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li>
+                    <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/favorites">Favorites</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Container -->
     <div class="main-container">
-        <!-- Sidebar for filters and search -->
+        <!-- Left Sidebar for filters and search -->
         <div class="sidebar">
             <h2>Search Restaurants</h2>
             <form class="search-form" onsubmit="filterRestaurants(event)">
@@ -472,10 +440,10 @@
                 <label for="restaurant-name">Restaurant Name:</label>
                 <input type="text" id="restaurant-name" name="restaurant_name" placeholder="Enter restaurant name...">
 
-                <!-- Dropdown for filters -->
+                <!-- Filters -->
                 <h2>Filters</h2>
 
-                <!-- Dropdown for cuisine type -->
+                <!-- Cuisine Type -->
                 <label for="search-cuisine">Cuisine Type:</label>
                 <select id="search-cuisine" name="cuisine_type">
                     <option value="">Any</option>
@@ -490,7 +458,7 @@
                     <option value="spanish">Spanish</option>
                 </select>
 
-                <!-- Dropdown for price range -->
+                <!-- Price Range -->
                 <label for="price-range">Price Range:</label>
                 <select id="price-range">
                     <option value="all">All</option>
@@ -501,47 +469,7 @@
                     <option value="5">Very Expensive</option>
                 </select>
 
-                <!-- Dropdown for hasDelivery -->
-                <label for="has-delivery">Delivery Available:</label>
-                <select id="has-delivery">
-                    <option value="">Any</option>
-                    <option value="true">Available</option>
-                    <option value="false">Not Available</option>
-                </select>
-
-                <!-- Dropdown for hasWiFi -->
-                <label for="has-wifi">WiFi Availability:</label>
-                <select id="has-wifi">
-                    <option value="">Any</option>
-                    <option value="true">Available</option>
-                    <option value="false">Not Available</option>
-                </select>
-
-                <!-- Dropdown for servesBeer -->
-                <label for="serves-beer">Serves Beer:</label>
-                <select id="serves-beer">
-                    <option value="">Any</option>
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-
-                <!-- Dropdown for hasOutdoorSeating -->
-                <label for="has-outdoor-seating">Outdoor Seating:</label>
-                <select id="has-outdoor-seating">
-                    <option value="">Any</option>
-                    <option value="true">Available</option>
-                    <option value="false">Not Available</option>
-                </select>
-
-                <!-- Dropdown for isGoodForChildren -->
-                <label for="is-good-for-children">Good for Children:</label>
-                <select id="is-good-for-children">
-                    <option value="">Any</option>
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-
-                <!-- Dropdown for sort options -->
+                <!-- Sort By -->
                 <label for="sort">Sort By:</label>
                 <select id="sort">
                     <option value="rating">Rating</option>
@@ -552,27 +480,25 @@
                 <!-- Submit Button -->
                 <button type="submit">Search</button>
             </form>
-    
-    <!-- View Favorites Button -->
-            <button id="save-favorites" onclick="window.location.href = '/favorites'">
-            Saved Favorites
-            <!-- List of favorite restaurants will be injected here -->
-    </div>
+        </div>
 
-        <!-- Main content area (map and restaurant list) -->
+        <!-- Map and Right Sidebar Container -->
         <div class="container">
-            <!-- Google Maps container -->
+            <!-- Map -->
             <div id="map"></div>
 
-            <!-- Right sidebar for the restaurant list -->
+            <!-- Right Sidebar -->
             <div class="restaurant-list">
                 <h2>Restaurants</h2>
-                <!-- The restaurants will be added here dynamically via JavaScript -->
+                <!-- Restaurants will be added here dynamically via JavaScript -->
+
+                <!-- View Favorites Button -->
+                <button id="view-favorites" onclick="window.location.href = '/favorites'">
+                    View Favorites
+                </button>
             </div>
         </div>
     </div>
-
-
 
 </body>
 </html>

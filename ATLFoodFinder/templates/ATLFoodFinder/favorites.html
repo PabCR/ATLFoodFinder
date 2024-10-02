@@ -1,37 +1,254 @@
+<!-- templates/ATLFoodFinder/favorites.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Favorites</title>
+    <title>Your Favorites</title>
+    <link rel="stylesheet" href="{% static 'ATLFoodFinder/styles.css' %}">
+<!-- Add this to your favorites.html within the <style> tags -->
     <style>
-        /* Add some styles for the favorites page */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+        /* General styles */
+        html, body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
-        .favorite-restaurant {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
+    
+        /* Navigation bar */
+        nav {
+            margin: 0;
+            padding: 15px;
+            background-color: #333;
+            text-align: center;
+        }
+    
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        nav ul li {
+            display: inline-block;
+            margin-right: 30px;
+        }
+    
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+    
+        nav ul li a:hover {
+            background-color: #555;
+        }
+    
+        /* Container for the content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+    
+        h1 {
+            color: #333;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+    
+        /* Favorites gallery */
+        .favorites-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Create 3 equal columns */
+            gap: 40px;
+            padding: 20px;
+            justify-items: center; /* Center items horizontally */
+        }
+
+        /* Favorite item */
+        .favorite-item {
+            background-color: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+    
+        .favorite-item-content {
+            padding: 20px;
+            flex-grow: 1;  /* Take up remaining space */
+        }
+    
+        .favorite-item h3 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            color: #0CAF50;
+        }
+    
+        .favorite-item p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+    
+        .favorite-item a {
+            color: #0CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    
+        .favorite-item a:hover {
+            text-decoration: underline;
+            padding: 15 15px;
+        }
+    
+        /* Delete button */
+        .delete-favorite-btn {
+            background-color: #dc3545; /* Bootstrap danger color */
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+    
+        .delete-favorite-btn:hover {
+            background-color: #c82333;
+        }
+    
+        /* View on Google Maps button */
+        .view-maps-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            background-color: #0CAF50;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+    
+        .view-maps-btn:hover {
+            background-color: #45a049;
+        }
+    
+        /* Footer (optional) */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            box-shadow: 0 -4px 2px -2px gray;
+        }
+    
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .favorites-gallery {
+                grid-template-columns: 1fr; /* Stack items */
+            }
         }
     </style>
+    
 </head>
 <body>
-    <h2>Your Favorite Restaurants</h2>
-    <div id="favorite-restaurants-list">
-        <!-- Favorite restaurants will be dynamically added here -->
+    <nav>
+        <ul>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+            <li>
+                <form method="POST" action="{% url 'logout' %}" style=body>
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+
+    <div class="container">
+        <h1>Your Favorite Restaurants</h1>
+        {% if favorites %}
+            <div class="favorites-list">
+                {% for favorite in favorites %}
+                    <div class="favorite-item">
+                        <h3>{{ favorite.restaurant.name }}</h3>
+                        <p>{{ favorite.restaurant.address }}</p>
+                        <!-- Link to Google Maps -->
+                        <p><a href="https://www.google.com/maps/search/?api=1&query={{ favorite.restaurant.name|urlencode }}&query_place_id={{ favorite.restaurant.place_id }}" target="_blank">View on Google Maps</a></p>
+                        <!-- Delete Button -->
+                        <button class="delete-favorite-btn" data-favorite-id="{{ favorite.id }}">Delete</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You have no favorite restaurants yet.</p>
+        {% endif %}
     </div>
 
+    <!-- JavaScript to handle delete functionality -->
     <script>
-        // Example JavaScript to load favorites dynamically
-        const favorites = JSON.parse(localStorage.getItem('favoriteRestaurants')) || [];
-        const favoritesList = document.getElementById('favorite-restaurants-list');
+        const csrfToken = '{{ csrf_token }}';
 
-        if (favorites.length === 0) {
-            favoritesList.innerHTML = '<p>No favorite restaurants added yet.</p>';
-        } else {
-            favorites.forEach(restaurant => {
-                favoritesList.innerHTML += `<div class="favorite-restaurant">${restaurant.name} - ${restaurant.cuisine}</div>`;
+        // Event listener for delete buttons
+        document.addEventListener('click', function(event) {
+            if (event.target && event.target.classList.contains('delete-favorite-btn')) {
+                const button = event.target;
+                const favoriteId = button.dataset.favoriteId;
+
+                if (confirm('Are you sure you want to delete this favorite?')) {
+                    deleteFavorite(favoriteId, button);
+                }
+            }
+        });
+
+        function deleteFavorite(favoriteId, button) {
+            fetch('/delete_favorite/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ favorite_id: favoriteId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Remove the favorite item from the DOM
+                    const favoriteItem = button.closest('.favorite-item');
+                    favoriteItem.parentNode.removeChild(favoriteItem);
+
+                    // Check if there are no more favorites
+                    if (document.querySelectorAll('.favorite-item').length === 0) {
+                        document.querySelector('.favorites-list').innerHTML = '<p>You have no favorite restaurants yet.</p>';
+                    }
+
+                    alert('Favorite deleted successfully.');
+                } else {
+                    alert('An error occurred while deleting the favorite.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the favorite.');
             });
         }
     </script>

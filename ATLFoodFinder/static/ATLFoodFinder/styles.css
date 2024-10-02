@@ -1,4 +1,4 @@
-/* Basic styles for the homepage */
+/* General Styles */
 html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -6,6 +6,35 @@ html, body {
     background-color: #f4f4f4;
 }
 
+/* Typography */
+h2 {
+    color: #333;
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #0CAF50;
+    font-size: 28px;
+    margin-top: 0;
+}
+
+p {
+    text-align: center;
+    color: #555;
+}
+
+p a {
+    color: #0CAF50;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+/* Header Styles */
 header {
     background-color: #0CAF50;
     color: white;
@@ -14,6 +43,7 @@ header {
     box-shadow: 0 4px 2px -2px gray;
 }
 
+/* Navigation Bar Styles */
 nav {
     margin: 0;
     padding: 15px;
@@ -44,6 +74,26 @@ nav ul li a:hover {
     background-color: #555;
 }
 
+/* Logout Button Styles */
+nav ul li form button {
+    font: inherit;
+    font-weight: bold;
+    background-color: transparent;
+    color: white;    
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+nav ul li form button:hover {
+    background-color: #555;
+}
+
+.logout {
+    color: red;
+}
+
+/* Main Content Styles */
 main {
     padding: 40px;
     max-width: 1200px;
@@ -60,15 +110,16 @@ main h2 {
     color: #333;
 }
 
+/* Featured Restaurants */
 .featured-restaurants {
-    display: flex;  /* Use flexbox to arrange children in a row */
-    justify-content: space-between;  /* Space out cards evenly */
-    flex-wrap: wrap;  /* Allow wrapping on smaller screens */
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .restaurant-card {
-    margin: 10px;  /* Space between cards */
-    text-align: center;  /* Center text below iframes */
+    margin: 10px;
+    text-align: center;
 }
 
 .restaurant-card img {
@@ -107,31 +158,7 @@ main h2 {
     background-color: #45a049;
 }
 
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #333;
-    color: white;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    box-shadow: 0 -4px 2px -2px gray;
-}
-
-h2 {
-    color: #333;
-    font-size: 36px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-h3 {
-    color: #0CAF50;
-    font-size: 28px;
-    margin-top: 0;
-}
-
-/* Style form and input elements within the card */
+/* Forms and Buttons */
 form {
     display: flex;
     flex-direction: column;
@@ -161,67 +188,129 @@ button:hover {
     background-color: #45a049;
 }
 
-p {
+/* Footer Styles */
+footer {
     text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 2px -2px gray;
+}
+
+/* Map Page Styles */
+body.map-page {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.map-page .main-container {
+    display: flex;
+    height: 100%;
+}
+
+.map-page .sidebar {
+    width: 300px;
+    padding: 20px;
+    background-color: #fafafa;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.map-page .sidebar h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.map-page .sidebar label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.map-page .sidebar select,
+.map-page .sidebar input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.map-page .sidebar button {
+    width: 100%;
+    padding: 12px;
+    background-color: #0CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.map-page .sidebar button:hover {
+    background-color: #45a049;
+}
+
+.map-page .container {
+    display: flex;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.map-page #map {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.map-page .restaurant-list {
+    width: 300px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.map-page .restaurant-list h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.map-page .restaurant {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    cursor: pointer;
+}
+
+.map-page .restaurant:hover {
+    background-color: #f9f9f9;
+}
+
+.map-page .restaurant.selected {
+    background-color: #e0f7fa;
+}
+
+.map-page .restaurant h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #007bff;
+}
+
+.map-page .restaurant p {
+    margin: 5px 0;
     color: #555;
 }
 
-p a {
-    color: #0CAF50;
-    text-decoration: none;
-}
-.logout{
-    color: red
+.map-page .restaurant:last-child {
+    border-bottom: none;
 }
 
-p a:hover {
-    text-decoration: underline;
-}
-
-/* Style the navigation bar for all pages */
-nav {
-    margin: 0;
-    padding: 15px;
-    background-color: #333;
-    text-align: center;
-}
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-nav ul li {
-    display: inline-block;
-    margin-right: 30px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 10px 20px;
-    border-radius: 5px;
-}
-
-nav ul li a:hover {
-    background-color: #555;
-}
-
-/* Make the logout button look like a link */
-nav ul li form button {
-    font: inherit; /* Use the same font as the links */
-    font-style: inherit;
-    font-weight: bold;
-    background-color: transparent; /* Match the background of the nav */
-    color: white;    
-    border: none; /* Remove default button border */
-    border-radius: 5px; /* Match the border radius of the other links */
-    cursor: pointer; /* Keep the pointer cursor for the button */
-}
-
-/* Add hover effect to the button */
-nav ul li form button:hover {
-    background-color: #555; /* Same hover effect as links */
+.map-page iframe {
+    width: 100%;
+    height: 200px;
+    border: none;
+    margin-top: 10px;
+    border-radius: 4px;
+    font-size: 14px;
 }

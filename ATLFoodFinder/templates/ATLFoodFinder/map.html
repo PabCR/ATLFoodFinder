@@ -313,38 +313,43 @@
         }
 
         /**
-         * Adds a restaurant to the sidebar list.
-         * @param {Object} place - The place object from the Places API.
-         */
-         function addRestaurantToSidebar(place) {
+        * Adds a restaurant to the sidebar list.
+        * @param {Object} place - The place object from the Places API.
+        */
+        function addRestaurantToSidebar(place) {
             const sidebar = document.querySelector('.restaurant-list');
             const restaurantDiv = document.createElement('div');
             restaurantDiv.classList.add('restaurant');
-        
+
             // Assign the place_id to the div for reference
             restaurantDiv.dataset.placeId = place.place_id;
-        
+
             // Get the cuisine types
             const knownCuisines = ['american', 'italian', 'asian', 'mexican', 'indian', 'japanese', 'thai', 'french', 'spanish'];
             const cuisineTypes = place.types
                 .filter(type => knownCuisines.includes(type))
                 .map(type => capitalizeFirstLetter(type))
                 .join(', ');
-        
+
             // Safely handle undefined properties
             const rating = place.rating || 'N/A';
             const userRatingsTotal = place.user_ratings_total || 0;
             const distanceInKm = (place.distance / 1000).toFixed(2); // Convert to kilometers
-        
+
             // Ensure userFavorites is defined and is an array
             const userFavorites = window.userFavorites || [];
-        
+
             // Determine if the restaurant is already favorited
             const isFavorited = userFavorites.includes(place.place_id);
-        
+
+            // Create a hyperlink for the address to Google Maps directions
+            const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=place_id:${(place.place_id)}`;
+
             restaurantDiv.innerHTML = `
                 <h3>${place.name}</h3>
-                <p>${place.vicinity} - ${getPriceLevel(place.price_level)}</p>
+                <p>
+                    <p><a href="https://www.google.com/maps/search/?api=1&query=${place.name}&query_place_id=${place.place_id}" target="_blank">"${place.vicinity}"</a> - ${place.price_level}
+                </p>
                 <p>Cuisine: ${cuisineTypes || 'Not specified'}</p>
                 <p>Rating: ${rating} (${userRatingsTotal} reviews)</p>
                 <p>Distance: ${distanceInKm} km</p>
@@ -356,7 +361,7 @@
                     ${isFavorited ? 'Saved' : 'Save to Favorites'}
                 </button>
             `;
-        
+
             // Add click event listener to highlight the marker
             restaurantDiv.addEventListener('click', (event) => {
                 // Prevent the event from firing when clicking the "Save to Favorites" button
@@ -366,9 +371,10 @@
                     map.setZoom(16);
                 }
             });
-        
+
             sidebar.appendChild(restaurantDiv);
         }
+
         
 
         /**

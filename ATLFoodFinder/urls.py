@@ -28,7 +28,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('login/', auth_views.LoginView.as_view(template_name='ATLFoodFinder/login.html', redirect_authenticated_user=True), name='login'),
     path('map/', views.map, name='map'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='ATLFoodFinder/password_reset.html'), name='password_reset'),

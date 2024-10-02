@@ -183,3 +183,5 @@ LOGOUT_REDIRECT_URL = '/'  # Ensures users are redirected to home after logout
 
 # Custom password reset settings (adjust email templates if needed)
 PASSWORD_RESET_TIMEOUT_DAYS = 1
+
+LOGOUT_REDIRECT_URL = 'home'

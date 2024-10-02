@@ -156,7 +156,6 @@ form input {
 
 button {
     padding: 10px;
-    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -176,6 +175,9 @@ p {
 p a {
     color: #4CAF50;
     text-decoration: none;
+}
+.logout{
+    color: red
 }
 
 p a:hover {
@@ -211,4 +213,21 @@ nav ul li a {
 
 nav ul li a:hover {
     background-color: #555;
+}
+
+/* Make the logout button look like a link */
+nav ul li form button {
+    background-color: transparent; /* Match the background of the nav */
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none; /* Remove default button border */
+    border-radius: 5px; /* Match the border radius of the other links */
+    cursor: pointer; /* Keep the pointer cursor for the button */
+    text-decoration: none; /* Remove default button text decoration */
+}
+
+/* Add hover effect to the button */
+nav ul li form button:hover {
+    background-color: #555; /* Same hover effect as links */
 }

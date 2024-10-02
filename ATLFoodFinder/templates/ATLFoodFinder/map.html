@@ -33,20 +33,51 @@
             }
             window.mapInitialized = true;
         
-            const atlanta = { lat: 33.7490, lng: -84.3880 };
+            // Default location (Atlanta) if geolocation fails
+            const defaultLocation = { lat: 33.7490, lng: -84.3880 };
         
+            // Create the map centered at the default location
             map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 14,
-                center: atlanta,
+                center: defaultLocation,
                 mapId: 'ace3d04f17040000' // Add your generated Map ID here
             });
         
             service = new google.maps.places.PlacesService(map);
             infowindow = new google.maps.InfoWindow();
         
-            // Perform an initial search
-            performSearch();
+            // Try to get the user's geolocation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        // Set map center to user's location
+                        map.setCenter(userLocation);
+        
+                        // Store user's location for later use
+                        window.userLocation = userLocation;
+        
+                        // Perform an initial search with user's location
+                        performSearch();
+                    },
+                    () => {
+                        // Geolocation failed or denied
+                        alert('Geolocation failed. Using default location.');
+                        window.userLocation = defaultLocation;
+                        performSearch();
+                    }
+                );
+            } else {
+                // Browser doesn't support Geolocation
+                alert('Your browser does not support geolocation. Using default location.');
+                window.userLocation = defaultLocation;
+                performSearch();
+            }
         }
+        
         
 
         /**
@@ -54,6 +85,9 @@
          * @param {Object} filters - The filters to apply to the search.
          */
          function performSearch(filters = {}) {
+            // Ensure userLocation is defined
+            const searchLocation = window.userLocation || { lat: 33.7490, lng: -84.3880 };
+        
             // Build the keyword parameter
             let keywords = [];
         
@@ -71,7 +105,7 @@
             const keywordString = keywords.join(' ');
         
             const request = {
-                location: map.getCenter(),
+                location: searchLocation,
                 radius: '5000',
                 type: ['restaurant'],
                 keyword: keywordString || '',
@@ -88,6 +122,15 @@
         
             service.nearbySearch(request, (results, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    // Calculate distance for each result
+                    results.forEach(place => {
+                        const placeLocation = place.geometry.location;
+                        const userLatLng = new google.maps.LatLng(searchLocation.lat, searchLocation.lng);
+        
+                        // Calculate distance in meters
+                        place.distance = google.maps.geometry.spherical.computeDistanceBetween(userLatLng, placeLocation);
+                    });
+        
                     // Sort the results based on the selected sortOption
                     let sortedResults = sortResults(results, filters.sortOption);
         
@@ -101,6 +144,7 @@
                 }
             });
         }
+        
         
 
         /**
@@ -127,27 +171,29 @@
         }
 
         /**
-         * Sorts the results based on the selected sort option.
-         * @param {Array} results - The results to sort.
-         * @param {String} sortOption - The sort option selected.
-         * @returns {Array} - The sorted results.
-         */
+        * Sorts the results based on the selected sort option.
+        * @param {Array} results - The results to sort.
+        * @param {String} sortOption - The sort option selected.
+        * @returns {Array} - The sorted results.
+        */
         function sortResults(results, sortOption) {
             let sortedResults = results.slice(); // Create a shallow copy
 
-            if (sortOption === 'rating') {
-                // Sort by rating descending
-                sortedResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-            } else if (sortOption === 'price') {
+            if (sortOption === 'price') {
                 // Sort by price_level ascending
                 sortedResults.sort((a, b) => (a.price_level || 0) - (b.price_level || 0));
-            } else if (sortOption === 'name') {
-                // Sort by name ascending
-                sortedResults.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortOption === 'distance') {
+                // Sort by distance ascending
+                sortedResults.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+            } else if (sortOption === 'rating') {
+                // Sort by rating descending
+                sortedResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
             }
 
             return sortedResults;
         }
+        
+        
 
         /**
          * Creates a marker for a restaurant on the map.
@@ -270,36 +316,38 @@
          * Adds a restaurant to the sidebar list.
          * @param {Object} place - The place object from the Places API.
          */
-        function addRestaurantToSidebar(place) {
+         function addRestaurantToSidebar(place) {
             const sidebar = document.querySelector('.restaurant-list');
             const restaurantDiv = document.createElement('div');
             restaurantDiv.classList.add('restaurant');
-
+        
             // Assign the place_id to the div for reference
             restaurantDiv.dataset.placeId = place.place_id;
-
+        
             // Get the cuisine types
             const knownCuisines = ['american', 'italian', 'asian', 'mexican', 'indian', 'japanese', 'thai', 'french', 'spanish'];
             const cuisineTypes = place.types
                 .filter(type => knownCuisines.includes(type))
                 .map(type => capitalizeFirstLetter(type))
                 .join(', ');
-
+        
             // Safely handle undefined properties
             const rating = place.rating || 'N/A';
             const userRatingsTotal = place.user_ratings_total || 0;
-
+            const distanceInKm = (place.distance / 1000).toFixed(2); // Convert to kilometers
+        
             // Ensure userFavorites is defined and is an array
             const userFavorites = window.userFavorites || [];
-
+        
             // Determine if the restaurant is already favorited
             const isFavorited = userFavorites.includes(place.place_id);
-
+        
             restaurantDiv.innerHTML = `
                 <h3>${place.name}</h3>
                 <p>${place.vicinity} - ${getPriceLevel(place.price_level)}</p>
                 <p>Cuisine: ${cuisineTypes || 'Not specified'}</p>
                 <p>Rating: ${rating} (${userRatingsTotal} reviews)</p>
+                <p>Distance: ${distanceInKm} km</p>
                 <button class="save-favorite-btn"
                     data-place-id="${encodeURIComponent(place.place_id)}"
                     data-name="${encodeURIComponent(place.name)}"
@@ -308,7 +356,7 @@
                     ${isFavorited ? 'Saved' : 'Save to Favorites'}
                 </button>
             `;
-
+        
             // Add click event listener to highlight the marker
             restaurantDiv.addEventListener('click', (event) => {
                 // Prevent the event from firing when clicking the "Save to Favorites" button
@@ -318,9 +366,10 @@
                     map.setZoom(16);
                 }
             });
-
+        
             sidebar.appendChild(restaurantDiv);
         }
+        
 
         /**
          * Converts the price level to a readable format.
@@ -336,14 +385,14 @@
          * Handles the filtering and updates the map and sidebar.
          * @param {Event} event - The event object.
          */
-        function filterRestaurants(event) {
+         function filterRestaurants(event) {
             event.preventDefault();
-
+        
             const restaurantName = document.getElementById('restaurant-name').value.trim();
             const cuisine = document.getElementById('search-cuisine').value;
             const sortOption = document.getElementById('sort').value;
             const priceRange = document.getElementById('price-range').value;
-
+        
             // Perform the search with the applied filters
             performSearch({
                 restaurantName,
@@ -352,6 +401,7 @@
                 priceRange,
             });
         }
+        
         // Event delegation for dynamically added "Save to Favorites" buttons
         document.addEventListener('click', function(event) {
             if (event.target && event.target.classList.contains('save-favorite-btn')) {
@@ -474,7 +524,7 @@
                 <select id="sort">
                     <option value="rating">Rating</option>
                     <option value="price">Price</option>
-                    <option value="name">Name</option>
+                    <option value="distance">Distance</option>
                 </select>
 
                 <!-- Submit Button -->

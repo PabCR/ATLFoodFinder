@@ -35,31 +35,38 @@
     <main>
         <section>
             <h2>Featured Restaurants</h2>
-            <div class="featured-restaurants">
-                <div class="restaurant-card">
-                    <img src="https://example.com/restaurant1.jpg" alt="Restaurant 1">
-                    <div class="restaurant-card-content">
-                        <h3>Restaurant 1</h3>
-                        <p>A popular spot for seafood lovers.</p>
-                    </div>
-                    <a href="#" class="view-business-btn">View Business</a>
-                </div>
-                <div class="restaurant-card">
-                    <img src="https://example.com/restaurant2.jpg" alt="Restaurant 2">
-                    <div class="restaurant-card-content">
-                        <h3>Restaurant 2</h3>
-                        <p>Perfect for a quick bite with friends.</p>
-                    </div>
-                    <a href="#" class="view-business-btn">View Business</a>
-                </div>
-                <div class="restaurant-card">
-                    <img src="https://example.com/restaurant3.jpg" alt="Restaurant 3">
-                    <div class="restaurant-card-content">
-                        <h3>Restaurant 3</h3>
-                        <p>Known for its exceptional desserts.</p>
-                    </div>
-                    <a href="#" class="view-business-btn">View Business</a>
-                </div>
+<div class="featured-restaurants">
+    <div class="restaurant-card">
+        <iframe
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&q=Seafood,Atlanta+GA"
+            width="300"
+            height="200" <!-- Adjust the height as needed -->
+            allowfullscreen>
+        </iframe>
+        <p>A popular spot for seafood lovers.</p>
+    </div>
+    
+    <div class="restaurant-card">
+        <iframe
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&q=Snack,Atlanta+GA"
+            width="300"
+            height="200" <!-- Adjust the height as needed -->
+            allowfullscreen>
+        </iframe>
+        <p>Perfect for a quick bite with friends.</p>
+    </div>
+
+    <div class="restaurant-card">
+        <iframe
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&q=Dessert,Atlanta+GA"
+            width="300"
+            height="200" <!-- Adjust the height as needed -->
+            allowfullscreen>
+        </iframe>
+        <p>Known for its exceptional desserts.</p>
+    </div>
+</div>
+
                 <div class="fixed-button-container">
                     <button class="explore-map-btn" onclick="window.location.href='/map'">
                         Explore Our ATL Food Finder

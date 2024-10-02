@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+    <style>
+        /* Add some styles for the favorites page */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .favorite-restaurant {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Your Favorite Restaurants</h2>
+    <div id="favorite-restaurants-list">
+        <!-- Favorite restaurants will be dynamically added here -->
+    </div>
+
+    <script>
+        // Example JavaScript to load favorites dynamically
+        const favorites = JSON.parse(localStorage.getItem('favoriteRestaurants')) || [];
+        const favoritesList = document.getElementById('favorite-restaurants-list');
+
+        if (favorites.length === 0) {
+            favoritesList.innerHTML = '<p>No favorite restaurants added yet.</p>';
+        } else {
+            favorites.forEach(restaurant => {
+                favoritesList.innerHTML += `<div class="favorite-restaurant">${restaurant.name} - ${restaurant.cuisine}</div>`;
+            });
+        }
+    </script>
+</body>
+</html>

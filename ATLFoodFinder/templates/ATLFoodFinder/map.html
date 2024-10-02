@@ -115,6 +115,13 @@
         .restaurant:last-child {
             border-bottom: none;
         }
+        .restaurant-list {
+            width: 20%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
 
         /* Styling for the iframe (embed map) */
         iframe {
@@ -129,6 +136,8 @@
     <!-- Load the Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCC-1bNF6qpwk9h_RNhbuOOVfiob-9JzeQ&callback=initMap" async defer></script>
     <script>
+        
+        
         // This function initializes the map
         function initMap() {
             const atlanta = { lat: 33.7490, lng: -84.3880 };
@@ -269,6 +278,8 @@
             </div>
         </div>
     </div>
+
+
 
 </body>
 

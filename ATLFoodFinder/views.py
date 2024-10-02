@@ -71,7 +71,7 @@ def save_favorite(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
-@login_required
+@login_required(login_url='/login/')
 def map(request):
     favorites = []
     if request.user.is_authenticated:
